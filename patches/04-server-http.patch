@@ -1,0 +1,25 @@
+diff --git a/tools/server/server-http.cpp b/tools/server/server-http.cpp
+--- a/tools/server/server-http.cpp
++++ b/tools/server/server-http.cpp
+@@ -304,12 +304,21 @@
+     const std::string hostname = host;
+     bool is_sock = false;
+     bool was_bound = false;
+
+     if (string_ends_with(std::string(hostname), ".sock")) {
++#if defined(_WIN32) && (!defined(_WIN32_WINNT) || _WIN32_WINNT < 0x0602)
++        // Windows 7: Unix domain sockets not supported
++        LOG_ERR("Unix domain sockets are not supported on Windows 7. "
++                "Please use TCP/IP instead (e.g., --host 127.0.0.1 --port 8080).\n");
++        return false;
++#else
+         is_sock = true;
+         srv->set_address_family(AF_UNIX);
+         was_bound = srv->bind_to_port(hostname, 8080);
++#endif
+     } else {
+         was_bound = srv->bind_to_port(hostname, port);
+     }
+
+     if (!was_bound) {
+         LOG_ERR("couldn't bind to %s:%d, is another process already using this port?\n", hostname.c_str(), port);

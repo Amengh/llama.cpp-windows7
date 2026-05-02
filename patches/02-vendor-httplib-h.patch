@@ -1,0 +1,19 @@
+diff --git a/vendor/cpp-httplib/httplib.h b/vendor/cpp-httplib/httplib.h
+--- a/vendor/cpp-httplib/httplib.h
++++ b/vendor/cpp-httplib/httplib.h
+@@ -14,12 +14,14 @@
+
+ #ifdef _WIN32
+-#if defined(_WIN32_WINNT) && _WIN32_WINNT < 0x0A00
+-#error                                                                         \
+-    "cpp-httplib doesn't support Windows 8 or lower. Please use Windows 10 or later."
+-#endif
++// Windows 7 compatibility: Comment out version check
++// #if defined(_WIN32_WINNT) && _WIN32_WINNT < 0x0A00
++// #error                                                                         \
++//     "cpp-httplib doesn't support Windows 8 or lower. Please use Windows 10 or later."
++// #endif
+ #endif
+
+ #ifndef _CRT_SECURE_NO_WARNINGS
+ #define _CRT_SECURE_NO_WARNINGS
