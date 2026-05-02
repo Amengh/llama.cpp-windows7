@@ -1,0 +1,44 @@
+## Windows 7 Compatibility Release v1.0.0
+
+This release adds full Windows 7 SP1 support to llama.cpp while maintaining compatibility with Windows 10/11.
+
+### What's Included
+- All source code with Windows 7 patches applied
+- 7 patch files for easy upstream synchronization
+- Complete build documentation
+- Automated build scripts
+
+### Key Features
+✅ Windows 7 SP1+ support
+✅ Windows 10/11 compatible
+✅ Fully static linking (no DLL dependencies)
+✅ Minimal code changes (8 files modified)
+✅ Easy to apply to new llama.cpp versions
+
+### API Replacements
+| Old API (Win8+) | New API (Win7+) |
+|-----------------|-----------------|
+| CreateFile2 | CreateFileW |
+| CreateFileMappingFromApp | CreateFileMapping |
+| MapViewOfFileFromApp | MapViewOfFile |
+
+### Requirements
+- Windows 7 SP1 or later
+- CMake 3.19.x (last version supporting Win7)
+- MinGW-w64 GCC or Visual Studio 2019
+
+### Quick Start
+```bash
+git clone https://github.com/Amengh/llama.cpp-windows7.git
+cd llama.cpp-windows7
+build_win7_final.bat
+```
+
+### Documentation
+- [Build Guide](docs/WINDOWS7_BUILD_GUIDE.md)
+- [API Changes](docs/WINDOWS7_API_CHANGES.md)
+- [Troubleshooting](docs/WINDOWS7_TROUBLESHOOTING.md)
+
+### Credits
+- Original llama.cpp: https://github.com/ggml-org/llama.cpp
+- cpp-httplib: https://github.com/yhirose/cpp-httplib
