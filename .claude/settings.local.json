@@ -32,7 +32,11 @@
       "Bash(pkg/tools/mingw-w64/bin/gcc.exe --version)",
       "Bash(unzip -q pkg/downloads/cmake-3.19.8-win64-x64.zip -d pkg/tools/)",
       "Bash(pkg/tools/cmake-3.19.8-win64-x64/bin/cmake.exe --version)",
-      "Bash(pkg/tools/mingw-w64/bin/mingw32-make.exe --version)"
+      "Bash(pkg/tools/mingw-w64/bin/mingw32-make.exe --version)",
+      "Bash(git branch *)",
+      "Bash(git add *)",
+      "Bash(git commit *)",
+      "Bash(git push *)"
     ]
   }
 }
