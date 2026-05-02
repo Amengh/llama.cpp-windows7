@@ -1,0 +1,22 @@
+diff --git a/ggml/CMakeLists.txt b/ggml/CMakeLists.txt
+--- a/ggml/CMakeLists.txt
++++ b/ggml/CMakeLists.txt
+@@ -76,12 +76,20 @@
+ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
+ if (WIN32)
+     set(CMAKE_STATIC_LIBRARY_PREFIX "")
+     set(CMAKE_SHARED_LIBRARY_PREFIX "")
+     set(CMAKE_SHARED_MODULE_PREFIX  "")
++
++    # Windows 7 compatibility support
++    if (LLAMA_WIN7_COMPAT)
++        add_compile_definitions(_WIN32_WINNT=0x0601)
++        add_compile_definitions(WINVER=0x0601)
++        message(STATUS "GGML: Building with Windows 7 compatibility")
++    endif()
+ endif()
+
+ if (NOT DEFINED CMAKE_RUNTIME_OUTPUT_DIRECTORY)
+     set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+ endif()

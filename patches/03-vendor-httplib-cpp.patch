@@ -1,0 +1,40 @@
+diff --git a/vendor/cpp-httplib/httplib.cpp b/vendor/cpp-httplib/httplib.cpp
+--- a/vendor/cpp-httplib/httplib.cpp
++++ b/vendor/cpp-httplib/httplib.cpp
+@@ -1464,12 +1464,12 @@
+   // File open
+   if (wpath.empty()) { return; }
+
+-  // Windows 8+ API - not available on Windows 7
+-  // hFile_ = ::CreateFile2(wpath.c_str(), GENERIC_READ, FILE_SHARE_READ,
+-  //                        OPEN_EXISTING, NULL);
++  // Windows 7 compatible - use CreateFileW instead of CreateFile2
++  // CreateFile2 is Windows 8+ only
++  // CreateFileW works on all Windows versions
++  hFile_ = ::CreateFileW(wpath.c_str(), GENERIC_READ, FILE_SHARE_READ,
++                         nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, nullptr);
+
+-  // Windows 7 compatible
+-  hFile_ = ::CreateFileW(wpath.c_str(), GENERIC_READ, FILE_SHARE_READ,
+-                         nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, nullptr);
+   if (hFile_ == INVALID_HANDLE_VALUE) { return; }
+
+   // File size
+@@ -1482,12 +1482,12 @@
+   size_ = static_cast<size_t>(size.QuadPart);
+
+   // Create mapping
+-  // Windows 8+ API - not available on Windows 7
+-  // hMapping_ = ::CreateFileMappingFromApp(hFile_, NULL, PAGE_READONLY, size_, NULL);
++  // Windows 7 compatible - use CreateFileMapping instead of CreateFileMappingFromApp
++  // CreateFileMappingFromApp is Windows 8+ only (UWP/Store API)
++  hMapping_ = ::CreateFileMapping(hFile_, NULL, PAGE_READONLY, 0, 0, NULL);
+
+-  // Windows 7 compatible
+-  hMapping_ = ::CreateFileMapping(hFile_, NULL, PAGE_READONLY, 0, 0, NULL);
+   if (!hMapping_) { return; }
+
+   // Map view
+-  // addr_ = ::MapViewOfFileFromApp(hMapping_, FILE_MAP_READ, 0, 0);
++  // Windows 7 compatible - use MapViewOfFile instead of MapViewOfFileFromApp
+   addr_ = ::MapViewOfFile(hMapping_, FILE_MAP_READ, 0, 0, 0);

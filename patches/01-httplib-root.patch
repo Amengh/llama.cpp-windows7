@@ -1,0 +1,61 @@
+diff --git a/httplib.h b/httplib.h
+--- a/httplib.h
++++ b/httplib.h
+@@ -185,12 +185,25 @@
+ #endif // NOMINMAX
+
+ #include <io.h>
+ #include <winsock2.h>
+ #include <ws2tcpip.h>
+
++// Windows 7 Compatibility: Define minimum Windows version
++#ifndef _WIN32_WINNT
++  #define _WIN32_WINNT 0x0601  // Windows 7
++#endif
++#ifndef WINVER
++  #define WINVER 0x0601  // Windows 7
++#endif
++
++// afunix.h only available on Windows 8+ (0x0602)
++#if _WIN32_WINNT >= 0x0602
+ // afunix.h uses types declared in winsock2.h, so has to be included after it.
+-#include <afunix.h>
++#  #include <afunix.h>
++#endif
+
+ #ifndef WSA_FLAG_NO_HANDLE_INHERIT
+ #define WSA_FLAG_NO_HANDLE_INHERIT 0x80
+ #endif
+
++// Windows 7 SP1 and below doesn't support WSA_FLAG_NO_HANDLE_INHERIT
+ using nfds_t = unsigned long;
+ using socket_t = SOCKET;
+ using socklen_t = int;
+@@ -3526,6 +3539,7 @@
+     hints.ai_flags = socket_flags;
+   }
+
++#if _WIN32_WINNT >= 0x0602  // AF_UNIX only for Windows 8+
+   if (hints.ai_family == AF_UNIX) {
+     const auto addrlen = host.length();
+     if (addrlen > sizeof(sockaddr_un::sun_path)) { return INVALID_SOCKET; }
+@@ -3573,6 +3587,7 @@
+
+     return sock;
+   }
++#endif  // _WIN32_WINNT >= 0x0602
+
+   auto service = std::to_string(port);
+
+@@ -3826,9 +3841,11 @@
+       }
+
+       if (addr.ss_family == AF_UNIX) {
++#if _WIN32_WINNT >= 0x0602
+         // Just log the fact. We do not want to fail because of this
+         auto unescaped_host = unescape_abstract_namespace_unix_domain(host);
+         LOG_ERR("connection failed. Host: %s Port: %d", unescaped_host.c_str(), port);
++#endif
+       } else if (addr.ss_family == AF_INET) {
+         LOG_ERR("connection failed. Host: %s Port: %d",
+                 inet_ntoa(reinterpret_cast<sockaddr_in *>(&addr)->sin_addr), port);

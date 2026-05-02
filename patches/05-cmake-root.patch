@@ -1,0 +1,25 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -61,12 +61,22 @@
+ # General
+
+ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
+ if (WIN32)
+     add_compile_definitions(_CRT_SECURE_NO_WARNINGS)
++
++    # Windows 7 compatibility option
++    option(LLAMA_WIN7_COMPAT "llama: build with Windows 7 compatibility" OFF)
++    if (LLAMA_WIN7_COMPAT)
++        add_compile_definitions(_WIN32_WINNT=0x0601)
++        add_compile_definitions(WINVER=0x0601)
++        message(STATUS "Building with Windows 7 compatibility")
++    endif()
+ endif()
+
+ if (NOT XCODE)
+     set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+ else()
+     set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin/$(CONFIGURATION))
+ endif()

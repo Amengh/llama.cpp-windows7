@@ -1,0 +1,64 @@
+// httplib_win7_compat.patch
+// Windows 7 兼容性补丁 for cpp-httplib
+// 这个补丁使 httplib.h 兼容 Windows 7 (包括 Windows 7 SP0 和 SP1)
+
+--- a/httplib.h
++++ b/httplib.h
+@@ -185,12 +185,25 @@
+ #endif // NOMINMAX
+
+ #include <io.h>
+ #include <winsock2.h>
+ #include <ws2tcpip.h>
+
++// Windows 7 兼容性检查
++// _WIN32_WINNT_WIN7 = 0x0601
++// 如果未定义目标 Windows 版本，则默认支持 Windows 7
++#ifndef _WIN32_WINNT
++  #define _WIN32_WINNT 0x0601
++#endif
++
++#if _WIN32_WINNT >= 0x0602  // Windows 8+
++  // afunix.h 需要 Windows 10 1803+ 或 Windows 8+
++  // 在 Windows 7 上禁用 Unix 域套接字支持
+ // afunix.h uses types declared in winsock2.h, so has to be included after it.
+-#include <afunix.h>
++#  #include <afunix.h>
++#endif
+
+ #ifndef WSA_FLAG_NO_HANDLE_INHERIT
+ #define WSA_FLAG_NO_HANDLE_INHERIT 0x80
+ #endif
+
++// Windows 7 SP1 以下版本不支持 WSA_FLAG_NO_HANDLE_INHERIT
+ using nfds_t = unsigned long;
+ using socket_t = SOCKET;
+ using socklen_t = int;
+@@ -3526,6 +3539,7 @@
+     hints.ai_flags = socket_flags;
+   }
+
++#if _WIN32_WINNT >= 0x0602  // AF_UNIX only for Windows 8+
+   if (hints.ai_family == AF_UNIX) {
+     const auto addrlen = host.length();
+     if (addrlen > sizeof(sockaddr_un::sun_path)) { return INVALID_SOCKET; }
+@@ -3573,6 +3587,7 @@
+
+     return sock;
+   }
++#endif  // _WIN32_WINNT >= 0x0602
+
+   auto service = std::to_string(port);
+
+@@ -3826,9 +3841,11 @@
+       }
+
+       if (addr.ss_family == AF_UNIX) {
++#if _WIN32_WINNT >= 0x0602
+         // Just log the fact. We do not want to fail because of this
+         auto unescaped_host = unescape_abstract_namespace_unix_domain(host);
+         LOG_ERR("connection failed. Host: %s Port: %d", unescaped_host.c_str(), port);
++#endif
+       } else if (addr.ss_family == AF_INET) {
+         LOG_ERR("connection failed. Host: %s Port: %d",
+                 inet_ntoa(reinterpret_cast<sockaddr_in *>(&addr)->sin_addr), port);
